@@ -1,3 +1,13 @@
+data-bin/
+model-bin/
+outputs/
+wandb/
+tmp_workspace/
+tmp-workspace/
+.hydra
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

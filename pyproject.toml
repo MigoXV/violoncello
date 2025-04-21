@@ -1,0 +1,40 @@
+[project]
+name = "violoncello"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "migo",email = "1695587905@qq.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "httpx (>=0.28.1,<0.29.0)",
+    "pandas (>=2.2.3,<3.0.0)",
+    "pyarrow (>=19.0.1,<20.0.0)",
+    "tqdm (>=4.67.1,<5.0.0)",
+    "yarl (>=1.19.0,<2.0.0)",
+    "minio (>=7.2.15,<8.0.0)",
+    "hydra-core >=1.0.7",
+    "numpy",
+    "audiomentations (>=0.40.0,<0.41.0)",
+]
+
+
+
+[[project.packages]]
+include = "violoncello"
+from = "."
+
+
+[[tool.poetry.source]]
+name = "tuna"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+priority = "primary"
+
+
+[tool.poetry.group.dev.dependencies]
+python-dotenv = "^1.1.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
