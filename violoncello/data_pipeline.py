@@ -154,7 +154,11 @@ class DataPipeline:
             # 同时等待 put 阶段处理完毕
             if self.put_to_minio:
                 put_bar = tqdm(
-                    total=len(df), desc="putting", unit="file", leave=False, position=2
+                    total=math.ceil(len(df) / self.batch_size),
+                    desc="putting",
+                    unit="file",
+                    leave=False,
+                    position=2,
                 )
                 loop.run_until_complete(self.put(base_url, bucket, put_bar))
             loop.close()
