@@ -84,26 +84,36 @@ class HttpxAudioDriver(AudioDriver):
         self._client = None
         self._pid = None
 
-    def get_audio(self, obj_name: str, step: bool = False) -> np.ndarray:
-        """从MinIO中获取音频"""
-        audio_url = str(self.bucket_url / unquote(obj_name))
+    def get_object(self, obj_name: str) -> bytes:
+        object_url = str(self.bucket_url / unquote(obj_name))
         try:
-            response = self.client.get(audio_url)
+            response = self.client.get(object_url)
             httpx.Client(timeout=30)
             response.raise_for_status()
-            audio, _ = librosa.load(io.BytesIO(response.content), sr=self.sr, mono=True)
+            content = response.content
+            return content
+        except httpx.HTTPStatusError as e:
+            logger.error(f"Failed to fetch object from {object_url}: {e}")
+        except httpx.RequestError as e:
+            logger.error(f"Request error for {object_url}: {e}")
+        except Exception as e:
+            logger.error(f"Unexpected error for {object_url}: {e}")
+
+    def get_audio(self, obj_name: str, step: bool = False) -> np.ndarray:
+        """从MinIO中获取音频"""
+        content = self.get_object(obj_name)
+        if content is None:
+            return
+        try:
+            audio, _ = librosa.load(io.BytesIO(content), sr=self.sr, mono=True)
             # <0，session永远无效，=0，session有效，>0，还有session_warmup次启动session
             if self._session_warmup < 0 or self._session_warmup > 0:
                 self._clear_session()
             if step:
                 self._session_warmup -= 1
             return audio
-        except httpx.HTTPStatusError as e:
-            logger.error(f"Failed to fetch audio from {audio_url}: {e}")
-        except httpx.RequestError as e:
-            logger.error(f"Request error for {audio_url}: {e}")
         except Exception as e:
-            logger.error(f"Unexpected error for {audio_url}: {e}")
+            logger.error(f"Error loading audio from {obj_name}: {e}")
 
     def warmup_step(self):
         """预热session"""
