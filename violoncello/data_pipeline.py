@@ -101,7 +101,7 @@ class DataPipeline:
         async with semaphore:
             try:
                 # 这里 data 参数由 fetch 阶段和 worker 线程处理后放入 put_queue 的数据中得到
-                response = await client.put(str(url), data=data)
+                response = await client.put(str(url), content=data)
                 response.raise_for_status()
             except Exception as e:
                 logger.error(f"[Error] Putting {url}: {e}")
@@ -167,11 +167,12 @@ class DataPipeline:
                 break
             fetch_df, fetch_data = fetch_batch
             try:
-                put_df, put_data = worker(
+                put_tuple = worker(
                     fetch_df,
                     fetch_data,
                 )
-                if self.put_to_minio:
+                if self.put_to_minio and put_tuple is not None:
+                    put_df, put_data = put_tuple
                     self.put_queue.put((put_df, put_data))
             except Exception as e:
                 logger.error(f"[Error] Processing row: {e}")
