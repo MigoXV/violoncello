@@ -12,6 +12,7 @@ from yarl import URL
 
 
 def read_with_progress(file_path: Path):
+    file_path = Path(file_path)
     chunk_size = 1024 * 1024  # 1MB
     num_chunks = math.ceil(os.path.getsize(file_path) / chunk_size)
     audio_data = bytearray()
