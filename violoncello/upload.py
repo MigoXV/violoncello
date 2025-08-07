@@ -40,7 +40,6 @@ async def upload_file(
     base_url: URL,
     semaphore: asyncio.Semaphore,
 ):
-
     async with semaphore:
         object_name = row["object_name"]
         # 读取文件
